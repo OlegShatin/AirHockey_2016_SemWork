@@ -35,7 +35,7 @@ public interface Controllable {
      * getters and setters of coordinates on game directly
      */
     double getX();
-    double setX();
+    double setX(double newX);
     double getY();
-    double setY();
+    double setY(double newY);
 }

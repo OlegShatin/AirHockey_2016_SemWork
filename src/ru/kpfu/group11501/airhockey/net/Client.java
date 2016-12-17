@@ -12,4 +12,9 @@ public interface Client {
     void gameStartsInTime(Long timeInstanceOfStart);
     void opponentIsReady();
     void opponentLeftGame();
+
+    void askGame();
+    void leaveGame();
+    void loseRound();
+
 }

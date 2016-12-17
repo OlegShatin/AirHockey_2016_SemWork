@@ -77,16 +77,20 @@ public class ClientImpl implements Runnable, Client {
                     int i = 0;
                     try {
                         for (String stringArg : request[1].split("&")) {
-                            if (method.getArgsClasses()[i].getName().equals("Integer")) {
+                            if (method.getArgsClasses()[i].equals(Integer.class)) {
                                 args[i] = method.getArgsClasses()[i].getMethod("parseInt", String.class)
                                         .invoke(null, stringArg);
                             } else {
-                                args[i] = method.getArgsClasses()[i]
-                                        .getMethod("parse" + method.getArgsClasses()[i].getName(), String.class)
-                                        .invoke(null, stringArg);
+                                if (method.getArgsClasses()[i].equals(String.class)) {
+                                    args[i]  = stringArg;
+                                } else {
+                                    args[i] = method.getArgsClasses()[i]
+                                            .getMethod("parse" + method.getArgsClasses()[i].getName(), String.class)
+                                            .invoke(null, stringArg);
+                                }
                             }
                         }
-                    } catch (NumberFormatException e){
+                    } catch (NumberFormatException e) {
                         e.printStackTrace();
 
                     }
@@ -132,6 +136,21 @@ public class ClientImpl implements Runnable, Client {
 
     @Override
     public void opponentLeftGame() {
+
+    }
+
+    @Override
+    public void askGame() {
+
+    }
+
+    @Override
+    public void leaveGame() {
+
+    }
+
+    @Override
+    public void loseRound() {
 
     }
 }
