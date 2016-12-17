@@ -20,12 +20,15 @@ public enum NetMethod {
     gameStartsInTime("GST", new Class[]{Long.class}, Client.class),
     opponentIsReady("OIR", null, Client.class),
     opponentLeftGame("OLG", null, Client.class),
+    setOpponentName("SON", new Class[]{String.class}, Client.class),
+
 
     //messages for server
     updateClientMalletDirection("UCD", new Class[]{Double.class, Double.class}, Server.class),
     clientIsReady("CIR", null, Server.class),
     clientAsksGame("CAG", null, Server.class),
     clientLeavesGame("CLG", null, Server.class),
+    clientLoseRound("CLR", null, Server.class)
     ;
     //Hash map to get method by code
     private static HashMap<String, NetMethod> codeMap;
