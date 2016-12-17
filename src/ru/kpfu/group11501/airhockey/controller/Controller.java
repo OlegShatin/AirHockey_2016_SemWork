@@ -27,7 +27,7 @@ public class Controller implements Client {
     private Boolean startFlag;
 
 
-    public void initialize(){
+    public void initialize() {
         //TODO - Design: initialize first scene - main menu + get name field value from form.
 
         client = new ClientImpl(name, this);
@@ -35,7 +35,7 @@ public class Controller implements Client {
 
 
     //todo - Design: passed click on "connect to game" button event - needed uploading of game main scene to form
-    private synchronized void connectToGame(){
+    private synchronized void connectToGame() {
         userCurrentGameScore = 0;
         opponentCurrentGameScore = 0;
         userMallet.block();
@@ -50,12 +50,9 @@ public class Controller implements Client {
             //needed to notify by event
             userIsReady.wait();
             opponentIsReady.wait();
-            if (userIsReady && opponentIsReady){
+            if (userIsReady && opponentIsReady) {
                 //notified by gameStartsInTime
-                startFlag.wait();
-                while (startFlag){
-                    roundRun();
-                }
+                gameStart();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -63,28 +60,43 @@ public class Controller implements Client {
 
     }
 
-    private void roundRun() {
+    private void gameStart() {
         new Thread(() -> {
-            int userBeforeStartScore = userCurrentGameScore;
-            userMallet.unblock();
-            opponentMallet.unblock();
-            puck.unblock();
-            while (true){
-                if (userBeforeStartScore != userCurrentGameScore)
-                    break;
-                if (puckInUserGates()){
-                    synchronized (client){
-                        client.loseRound();
-                    }
-                    break;
+            try {
+                startFlag.wait();
+                while (startFlag) {
+                    roundRun();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            userMallet.block();
-            opponentMallet.block();
-            puck.block();
-            puck.setX(GAME_FIELD_CENTER_X);
-            puck.setY(GAME_FIELD_CENTER_Y);
+
         }).start();
+
+    }
+
+    private void roundRun() {
+
+        int userBeforeStartScore = userCurrentGameScore;
+        userMallet.unblock();
+        opponentMallet.unblock();
+        puck.unblock();
+        while (true) {
+            if (userBeforeStartScore != userCurrentGameScore)
+                break;
+            if (puckInUserGates()) {
+                synchronized (client) {
+                    client.loseRound();
+                }
+                break;
+            }
+        }
+        userMallet.block();
+        opponentMallet.block();
+        puck.block();
+        puck.setX(GAME_FIELD_CENTER_X);
+        puck.setY(GAME_FIELD_CENTER_Y);
+        startFlag.notifyAll();
 
     }
 
@@ -95,12 +107,14 @@ public class Controller implements Client {
 
     @Override
     public void updatePuckDirection(Double puckX, Double puckY) {
-
+        puck.move(puckX, puckY);
     }
 
     @Override
     public void updateGameScore(Integer clientScore, Integer opponentScore) {
-
+        userCurrentGameScore = clientScore;
+        opponentCurrentGameScore = opponentScore;
+        //todo: something another?
     }
 
     @Override
@@ -116,7 +130,7 @@ public class Controller implements Client {
     //time offset to synchronize start time between clients
     @Override
     public void gameStartsInTime(Long timeInstanceOfStart) {
-        if (startFlag == null){
+        if (startFlag == null) {
             startFlag = false;
         }
         Timer timer = new Timer();
