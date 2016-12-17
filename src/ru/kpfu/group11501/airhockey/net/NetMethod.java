@@ -12,9 +12,9 @@ public enum NetMethod {
 
     //for client and for server
     updatePuckDirection("UPD", new Class[]{Double.class, Double.class}, Object.class),
-    updateGameScore("UGS", new Class[]{Integer.class, Integer.class}, Object.class),
 
     //messages for client
+    updateGameScore("UGS", new Class[]{Integer.class, Integer.class}, Client.class),
     updateOpponentMalletDirection("UOD", new Class[]{Double.class, Double.class}, Client.class),
     setGameResult("SGR", new Class[]{Integer.class, Integer.class}, Client.class),
     gameStartsInTime("GST", new Class[]{Long.class}, Client.class),

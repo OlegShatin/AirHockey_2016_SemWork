@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Controller implements Client {
+public class Controller {
     //TODO Design: please override this constants
     private static final double GAME_FIELD_CENTER_X = 300;
     private static final double GAME_FIELD_CENTER_Y = 300;
@@ -105,37 +105,37 @@ public class Controller implements Client {
         return false;
     }
 
-    @Override
+    
     public void updatePuckDirection(Double puckX, Double puckY) {
         puck.move(puckX, puckY);
     }
 
-    @Override
+    
     public void updateGameScore(Integer clientScore, Integer opponentScore) {
         userCurrentGameScore = clientScore;
         opponentCurrentGameScore = opponentScore;
         //todo: something another?
     }
 
-    @Override
+    
     public void updateOpponentMalletDirection(Double malletX, Double malletY) {
         opponentMallet.move(malletX, malletY);
     }
 
-    @Override
+    
     public void setGameResult(Integer clientScore, Integer opponentScore) {
         //TODO: Design - this method describes behavior by result of game
     }
 
     //time offset to synchronize start time between clients
-    @Override
+    
     public void gameStartsInTime(Long timeInstanceOfStart) {
         if (startFlag == null) {
             startFlag = false;
         }
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
-            @Override
+            
             public void run() {
                 startFlag = true;
                 startFlag.notifyAll();
@@ -143,27 +143,27 @@ public class Controller implements Client {
         }, Date.from(Instant.ofEpochMilli(timeInstanceOfStart)));
     }
 
-    @Override
+    
     public void opponentIsReady() {
         //TODO: Design - this method to set opponent
     }
 
-    @Override
+    
     public void opponentLeftGame() {
         //TODO: Design - this method describes behavior by leaving opponent, without any messages about result of game
     }
 
-    @Override
+    
     public void askGame() {
         //plug
     }
 
-    @Override
+    
     public void leaveGame() {
         //plug
     }
 
-    @Override
+    
     public void loseRound() {
         //plug
     }
