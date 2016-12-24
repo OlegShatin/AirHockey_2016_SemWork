@@ -9,12 +9,12 @@ import ru.kpfu.group11501.airhockey.controller.Controller;
 
 public class Main extends Application {
 
-    private Controller controller;
-
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("reg.fxml"));
-        primaryStage.setTitle("Airhockey");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("registration.fxml"));
+        Parent root = loader.load();
+        Controller registrationController = loader.getController();
+        registrationController.setStage(primaryStage);
         primaryStage.setScene(new Scene(root, 400, 600));
         primaryStage.show();
 

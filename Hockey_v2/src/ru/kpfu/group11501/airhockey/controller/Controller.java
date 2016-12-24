@@ -1,10 +1,17 @@
 package ru.kpfu.group11501.airhockey.controller;
 
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import ru.kpfu.group11501.airhockey.model.Mallet;
 import ru.kpfu.group11501.airhockey.model.Puck;
@@ -35,6 +42,13 @@ public class Controller implements Client {
     private Integer opponentCurrentGameScore;
     private Boolean startFlag;
 
+    private Stage stage;
+    @FXML
+    private ImageView malRed;
+    @FXML
+    private ImageView sam;
+    @FXML
+    private Pane gameField;
 
     public void initialize(){
         //TODO - Design: initialize first scene - main menu + get name field value from form.
@@ -43,7 +57,22 @@ public class Controller implements Client {
     }
 
 
+    private boolean isInputNameNotNull() {
+        return namePlayer.getLength() != 0;
+    }
+
     //todo - Design: passed click on "connect to game" button event - needed uploading of game main scene to form
+    public void onClickInMethod(Event event) throws IOException {
+        if(isInputNameNotNull()) {
+            Parent root = FXMLLoader.load(getClass().getResource("game.fxml"));
+            stage.setScene(new Scene(root, 400, 600));
+        } else {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setContentText("Please, enter your name");
+            a.show();
+        }
+    }
+
     private synchronized void connectToGame(){
         userCurrentGameScore = 0;
         opponentCurrentGameScore = 0;
@@ -70,6 +99,33 @@ public class Controller implements Client {
             e.printStackTrace();
         }
 
+        userMallet = new Mallet(malRed, gameField);
+        puck = new Puck(sam, gameField);
+    }
+
+    public void keyPressed(KeyEvent event) {
+
+        if (event.getCode() == KeyCode.RIGHT) {
+            userMallet.getView().setScaleX(1);
+            userMallet.move(20, 0);
+        }
+        if (event.getCode() == KeyCode.DOWN) {
+            userMallet.move(0, 20);
+        }
+        if (event.getCode() == KeyCode.LEFT) {
+            userMallet.getView().setScaleX(-1);
+            userMallet.move(-20, 0);
+        }
+        if (event.getCode() == KeyCode.UP) {
+            userMallet.move(0, -20);
+        }
+        if(event.getCode() == KeyCode.SPACE) {
+            puck.move(10, 0);
+        }
+    }
+
+    public void mouseMoved(MouseEvent mouseEvent) {
+        userMallet.move(mouseEvent.getX(),mouseEvent.getY());
     }
 
     private void roundRun() {
@@ -161,5 +217,9 @@ public class Controller implements Client {
     @Override
     public void loseRound() {
         //plug
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 }
