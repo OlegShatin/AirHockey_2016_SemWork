@@ -1,5 +1,4 @@
-package ru.kpfu.itis.group11501.airhockey.model;
-
+package ru.kpfu.group11501.airhockey.model;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.ImageView;
@@ -27,9 +26,6 @@ public class Puck implements Controllable {
         if(gameField.getChildren().contains(view)) {
             double dX = newX - view.getX() - view.getLayoutX();
             double dY = newY - view.getY() - view.getLayoutY();
-
-            double rateX = dX / DISTANCE;
-            double rateY = dY / DISTANCE;
 
             if(currentMoveTimer != null) {
                 currentMoveTimer.stop();
@@ -72,4 +68,25 @@ public class Puck implements Controllable {
     public boolean isBlocked() {
         return false;
     }
+
+    @Override
+    public double getX() {
+        return view.getX();
+    }
+
+    @Override
+    public void setX(double newX) {
+        view.setX(newX);
+    }
+
+    @Override
+    public double getY() {
+        return view.getY();
+    }
+
+    @Override
+    public void setY(double newY) {
+        view.setY(newY);
+    }
+
 }

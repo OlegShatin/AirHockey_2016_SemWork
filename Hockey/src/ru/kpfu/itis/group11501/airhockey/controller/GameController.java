@@ -1,11 +1,13 @@
 package ru.kpfu.itis.group11501.airhockey.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import ru.kpfu.itis.group11501.airhockey.model.Mallet;
 import ru.kpfu.itis.group11501.airhockey.model.Puck;
 
@@ -18,7 +20,7 @@ import java.util.List;
  * Created by Svetlana on 18.12.2016.
  */
 public class GameController {
-    
+
     @FXML
     private ImageView malRed;
     @FXML
@@ -27,6 +29,7 @@ public class GameController {
     private ImageView sam;
     private Puck puck;
     private Mallet mallet;
+    private Stage stage;
 
     public void initialize() {
         mallet = new Mallet(malRed, gameField);
@@ -58,4 +61,7 @@ public class GameController {
         mallet.move(mouseEvent.getX(),mouseEvent.getY());
     }
 
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 }

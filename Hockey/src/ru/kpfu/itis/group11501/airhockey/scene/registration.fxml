@@ -8,9 +8,10 @@
 <?import javafx.scene.text.Text?>
 
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.itis.group11501.airhockey.controller.RegistrationController">
+<?import javafx.scene.layout.AnchorPane?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.itis.group11501.airhockey.controller.RegistrationController">
    <children>
-      <ImageView fx:id="buttonIn" fitHeight="600.0" fitWidth="406.0" layoutX="12.0" onMouseClicked="#onClickInMethod" pickOnBounds="true" preserveRatio="true">
+      <ImageView  fitHeight="600.0" fitWidth="406.0" layoutX="12.0"  pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/back.jpg" />
          </image>
@@ -20,4 +21,4 @@
       <Text layoutX="149.0" layoutY="357.0" scaleX="2.0" scaleY="2.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Введите свое имя" wrappingWidth="99.76822662353516" />
       <Text layoutX="109.0" layoutY="234.0" scaleX="3.0" scaleY="3.0" scaleZ="3.0" strokeType="OUTSIDE" strokeWidth="0.0" text="AIR HOCKEY" />
    </children>
-</Pane>
+</AnchorPane>

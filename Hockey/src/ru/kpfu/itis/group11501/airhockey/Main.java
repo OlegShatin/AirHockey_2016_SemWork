@@ -9,16 +9,27 @@ import ru.kpfu.itis.group11501.airhockey.controller.GameController;
 import ru.kpfu.itis.group11501.airhockey.controller.RegistrationController;
 
 public class Main extends Application {
-    private final static int SCREEN_WIDTH = 400;
-    private final static int SCREEN_HEIGHT = 600;
+
+    /*private Stage mainStage;*/
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("scene/game.fxml"));
+
+        /*this.mainStage = primaryStage;
+        Parent root = FXMLLoader.load(getClass().getResource("scene/registration.fxml"));
         primaryStage.setTitle("AirHockey");
-        primaryStage.setScene(new Scene(root, SCREEN_WIDTH, SCREEN_HEIGHT));
+
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("scene/registration.fxml"));
+        loader.load();
+        registrationController = root.cont;
+        registrationController.setStage(primaryStage);
+        //controller.initialize();*/
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("scene/registration.fxml"));
+        Parent root = loader.load();
+        RegistrationController registrationController = loader.getController();
+        registrationController.setStage(primaryStage);
+        primaryStage.setScene(new Scene(root, 400, 600));
         primaryStage.show();
-        primaryStage.getScene().getRoot().requestFocus();
     }
 
 
@@ -26,3 +37,4 @@ public class Main extends Application {
         launch(args);
     }
 }
+
