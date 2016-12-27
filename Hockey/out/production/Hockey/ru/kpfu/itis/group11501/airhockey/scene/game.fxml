@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<GridPane fx:id="root" alignment="center" hgap="10" onKeyPressed="#keyPressed" onMouseMoved="#mouseMoved" prefHeight="600.0" prefWidth="400.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.itis.group11501.airhockey.controller.GameController">
+    <columnConstraints>
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+    </rowConstraints>
+    <children>
+        <Pane fx:id="gameField" prefHeight="600.0" prefWidth="400.0">
+            <children>
+                <ImageView fitHeight="600.0" fitWidth="556.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../img/field.jpg" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="malRed" fitHeight="49.0" fitWidth="50.0" layoutX="75.0" layoutY="467.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../img/b2.jpg" />
+                    </image>
+                </ImageView>
+                <ImageView fitHeight="49.0" fitWidth="50.0" layoutX="67.0" layoutY="104.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../img/b2.jpg" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="sam" fitHeight="49.0" fitWidth="50.0" layoutX="255.0" layoutY="382.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../img/sem.jpg" />
+                    </image>
+                </ImageView>
+                <ImageView fitHeight="49.0" fitWidth="50.0" layoutX="337.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../img/media.png" />
+                    </image>
+                </ImageView>
+                <Label layoutX="14.0" layoutY="236.0" text="1">
+                    <font>
+                        <Font size="35.0" />
+                    </font>
+                </Label>
+                <Label layoutX="14.0" layoutY="314.0" text="2">
+                    <font>
+                        <Font size="35.0" />
+                    </font>
+                </Label>
+            <Text layoutX="11.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Имя" wrappingWidth="112.990234375">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Text>
+            <Text layoutX="11.0" layoutY="568.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Имя" wrappingWidth="112.990234375">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Text>
+            </children>
+        </Pane>
+    </children>
+</GridPane>

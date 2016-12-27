@@ -1,4 +1,5 @@
-package ru.kpfu.group11501.airhockey.model;
+package ru.kpfu.itis.group11501.airhockey.model;
+
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.ImageView;
@@ -9,7 +10,6 @@ import javafx.scene.layout.Pane;
  *         11-501
  */
 public class Mallet implements Controllable {
-
     private ImageView view;
     private Pane gameField;
     private AnimationTimer currentMoveTimer;
@@ -69,24 +69,5 @@ public class Mallet implements Controllable {
         return false;
     }
 
-    @Override
-    public double getX() {
-        return view.getX();
-    }
-
-    @Override
-    public void setX(double newX) {
-        view.setX(newX);
-    }
-
-    @Override
-    public double getY() {
-        return view.getY();
-    }
-
-    @Override
-    public void setY(double newY) {
-        view.setY(newY);
-    }
 
 }

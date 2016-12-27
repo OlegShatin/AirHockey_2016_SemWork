@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Controller {
+public class Controller implements Client {
     //TODO Design: please override this constants
     private static final double GAME_FIELD_CENTER_X = 300;
     private static final double GAME_FIELD_CENTER_Y = 300;
@@ -90,26 +90,14 @@ public class Controller {
             opponentIsReady.wait();
             if (userIsReady && opponentIsReady){
                 //notified by gameStartsInTime
-                gameStart();
+                startFlag.wait();
+                while (startFlag){
+                    roundRun();
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-    }
-
-    private void gameStart() {
-        new Thread(() -> {
-            try {
-                startFlag.wait();
-                while (startFlag) {
-                    roundRun();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }).start();
 
         userMallet = new Mallet(malRed, gameField);
         puck = new Puck(sam, gameField);
@@ -141,27 +129,27 @@ public class Controller {
     }
 
     private void roundRun() {
-
-        int userBeforeStartScore = userCurrentGameScore;
-        userMallet.unblock();
-        opponentMallet.unblock();
-        puck.unblock();
-        while (true) {
-            if (userBeforeStartScore != userCurrentGameScore)
-                break;
-            if (puckInUserGates()) {
-                synchronized (client) {
-                    client.loseRound();
+        new Thread(() -> {
+            int userBeforeStartScore = userCurrentGameScore;
+            userMallet.unblock();
+            opponentMallet.unblock();
+            puck.unblock();
+            while (true){
+                if (userBeforeStartScore != userCurrentGameScore)
+                    break;
+                if (puckInUserGates()){
+                    synchronized (client){
+                        client.loseRound();
+                    }
+                    break;
                 }
-                break;
             }
-        }
-        userMallet.block();
-        opponentMallet.block();
-        puck.block();
-        puck.setX(GAME_FIELD_CENTER_X);
-        puck.setY(GAME_FIELD_CENTER_Y);
-        startFlag.notifyAll();
+            userMallet.block();
+            opponentMallet.block();
+            puck.block();
+            puck.setX(GAME_FIELD_CENTER_X);
+            puck.setY(GAME_FIELD_CENTER_Y);
+        }).start();
 
     }
 
@@ -170,37 +158,35 @@ public class Controller {
         return false;
     }
 
-
+    @Override
     public void updatePuckDirection(Double puckX, Double puckY) {
-        puck.move(puckX, puckY);
+
     }
 
-
+    @Override
     public void updateGameScore(Integer clientScore, Integer opponentScore) {
-        userCurrentGameScore = clientScore;
-        opponentCurrentGameScore = opponentScore;
-        //todo: something another?
+
     }
 
-
+    @Override
     public void updateOpponentMalletDirection(Double malletX, Double malletY) {
         opponentMallet.move(malletX, malletY);
     }
 
-
+    @Override
     public void setGameResult(Integer clientScore, Integer opponentScore) {
         //TODO: Design - this method describes behavior by result of game
     }
 
     //time offset to synchronize start time between clients
-
+    @Override
     public void gameStartsInTime(Long timeInstanceOfStart) {
-        if (startFlag == null) {
+        if (startFlag == null){
             startFlag = false;
         }
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
-
+            @Override
             public void run() {
                 startFlag = true;
                 startFlag.notifyAll();
@@ -208,27 +194,27 @@ public class Controller {
         }, Date.from(Instant.ofEpochMilli(timeInstanceOfStart)));
     }
 
-
+    @Override
     public void opponentIsReady() {
         //TODO: Design - this method to set opponent
     }
 
-
+    @Override
     public void opponentLeftGame() {
         //TODO: Design - this method describes behavior by leaving opponent, without any messages about result of game
     }
 
-
+    @Override
     public void askGame() {
         //plug
     }
 
-
+    @Override
     public void leaveGame() {
         //plug
     }
 
-
+    @Override
     public void loseRound() {
         //plug
     }
