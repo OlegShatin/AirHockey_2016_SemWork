@@ -10,7 +10,7 @@ public interface Server {
     void updatePuckDirection(Double clientPuckX, Double clientPuckY);
     void updateClientMalletDirection(Double clientMalletX, Double clientMalletY);
     void clientIsReady();
-    void clientAsksGame();
+    void clientAsksGame(String name);
     void clientLeavesGame() throws SocketException;
     void clientLoseRound();
 }

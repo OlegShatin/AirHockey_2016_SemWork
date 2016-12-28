@@ -54,18 +54,31 @@ public class ServerImpl extends Thread implements Server {
 
     @Override
     public void clientIsReady() {
-        clientIsReady = true;
+        if (client1IsReady){
+            client2IsReady = true;
+        } else {
+            if (!client2IsReady) {
+                client2IsReady = true;
+            } else {
+                client1IsReady = true;
+            }
+
+        }
         opponentsPrintWriter.println(NetMethod.opponentIsReady.getCode());
+        System.out.println("c1 ready:" + client1IsReady);
+        System.out.println("c2 ready:" + client2IsReady);
         if (client1IsReady && client2IsReady){
             //game starts in 5 seconds after this moment
             long startTime = Instant.now().toEpochMilli() + 1000 * 5;
             opponentsPrintWriter.println(NetMethod.gameStartsInTime.getCode()+"?"+startTime);
+            clientsPrintWriter.println(NetMethod.gameStartsInTime.getCode()+"?"+startTime);
+            System.out.println("GAME STARTS IN 5 SEC");
         }
     }
 
     @Override
-    public void clientAsksGame() {
-        //?
+    public void clientAsksGame(String name) {
+        opponentsPrintWriter.println(NetMethod.setOpponentName.getCode()+"?"+name);
     }
 
     @Override
@@ -89,6 +102,7 @@ public class ServerImpl extends Thread implements Server {
                 String[] request = clientBufferedReader.readLine().split("\\?");
                 NetMethod method = NetMethod.getMethod(request[0]);
                 Method executableMethod = Server.class.getMethod(method.name(), method.getArgsClasses());
+                System.out.println(method.name());
                 //try to parse arguments from string to Integer, Double and Long if they exists
                 Object[] args = null;
                 if (request.length > 1) {
@@ -104,7 +118,7 @@ public class ServerImpl extends Thread implements Server {
                                 args[i] = stringArg;
                             } else {
                                 args[i] = method.getArgsClasses()[i]
-                                        .getMethod("parse" + method.getArgsClasses()[i].getName(), String.class)
+                                        .getMethod("parse" + method.getArgsClasses()[i].getSimpleName(), String.class)
                                         .invoke(null, stringArg);
                             }
                         }

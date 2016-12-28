@@ -26,7 +26,7 @@ public enum NetMethod {
     //messages for server
     updateClientMalletDirection("UCD", new Class[]{Double.class, Double.class}, Server.class),
     clientIsReady("CIR", null, Server.class),
-    clientAsksGame("CAG", null, Server.class),
+    clientAsksGame("CAG",new Class[] {String.class}, Server.class),
     clientLeavesGame("CLG", null, Server.class),
     clientLoseRound("CLR", null, Server.class)
     ;

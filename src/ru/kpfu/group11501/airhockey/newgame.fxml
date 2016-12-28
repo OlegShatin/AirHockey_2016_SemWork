@@ -6,14 +6,14 @@
 <?import javafx.scene.text.Text?>
 
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:controller="ru.kpfu.group11501.airhockey.controller.ReadyController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Text layoutX="64.0" layoutY="113.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Начать игру?" textAlignment="CENTER">
          <font>
             <Font size="29.0" />
          </font>
       </Text>
-      <Button layoutX="178.0" layoutY="193.0" mnemonicParsing="false" text="Я готов!">
+      <Button layoutX="178.0" layoutY="193.0" mnemonicParsing="false" text="Я готов!" onMouseClicked="#userIsReady">
          <font>
             <Font size="14.0" />
          </font>
