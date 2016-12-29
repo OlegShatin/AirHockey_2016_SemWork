@@ -3,6 +3,7 @@ package ru.kpfu.group11501.airhockey.model;
 import javafx.animation.AnimationTimer;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import ru.kpfu.group11501.airhockey.net.Client;
 
 /**
  * @author Oleg Shatin
@@ -13,7 +14,7 @@ public class Mallet implements Controllable {
     private ImageView view;
     private Pane gameField;
     private AnimationTimer currentMoveTimer;
-    private Puck puck;
+    private Client client;
 
     private static final double DISTANCE = 10;
     private boolean blocked;
@@ -22,15 +23,24 @@ public class Mallet implements Controllable {
         return view;
     }
 
-    public Mallet(ImageView view, Pane gameField) {
+    public Mallet(ImageView view, Pane gameField, Client client) {
         this.view = view;
         this.gameField = gameField;
         blocked = false;
+        this.client = client;
     }
 
     @Override
-    public void move(double newX, double newY) {
+    public void move(double newX, double newY, boolean needSendDataToServer) {
         if(gameField.getChildren().contains(view) && !blocked) {
+            if (needSendDataToServer) {
+                if (newY < 300 + view.getFitWidth()/2) {
+                    newY = 300 + view.getFitWidth()/2;
+                }
+                synchronized (client) {
+                    client.sendMalletDirection(newX, newY);
+                }
+            }
             double dX = newX - view.getX() - view.getLayoutX() - view.getFitWidth()/2;
             double dY = newY - view.getY() - view.getLayoutY() - view.getFitHeight()/2;
 
@@ -44,9 +54,7 @@ public class Mallet implements Controllable {
                 int i = 0;
                 @Override
                 public void handle(long now) {
-                    if (view.getBoundsInParent().intersects(puck.getView().getBoundsInParent())){
-                        puck.move(getX(),getY());
-                    }
+
                     if (i < DISTANCE) {
 
                         view.setX(view.getX() + rateX);
@@ -58,6 +66,10 @@ public class Mallet implements Controllable {
                 }
             };
             currentMoveTimer.start();
+        } else {
+            if (currentMoveTimer != null) {
+                currentMoveTimer.stop();
+            }
         }
     }
 
@@ -78,7 +90,7 @@ public class Mallet implements Controllable {
 
     @Override
     public double getX() {
-        return view.getX()- view.getFitWidth()/2 - view.getLayoutX();
+        return view.getX()+ view.getFitWidth()/2 + view.getLayoutX();
     }
 
     @Override
@@ -88,7 +100,7 @@ public class Mallet implements Controllable {
 
     @Override
     public double getY() {
-        return view.getY()- view.getFitHeight()/2 - view.getLayoutY();
+        return view.getY() + view.getFitHeight()/2 + view.getLayoutY();
     }
 
     @Override
@@ -96,7 +108,10 @@ public class Mallet implements Controllable {
         view.setY(newY - view.getLayoutY() - view.getFitHeight()/2);
     }
 
-    public void setPuck(Puck puck) {
-        this.puck = puck;
+    @Override
+    public void setClient(Client client) {
+        this.client = client;
     }
+
+
 }

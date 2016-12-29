@@ -15,7 +15,8 @@ public interface Client {
     void gameStartsInTime(Long timeInstanceOfStart);
     void opponentIsReady();
     void opponentLeftGame();
-
+    void sendPuckDirection(Double puckX, Double puckY);
+    void sendMalletDirection(Double malletX, Double malletY);
     void setReady();
     void setController(Controller controller);
     void askGame(String name);

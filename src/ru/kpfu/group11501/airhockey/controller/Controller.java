@@ -32,12 +32,18 @@ public abstract class Controller {
     public void updateMainInfo() {
     }
 
-    public void setOpponentName(String opponentName) {
+    public void setOpponentName() {
     }
 
     public void updateScore(Integer clientScore, Integer opponentScore) {
     }
 
     public void gameStartsInTime(Long timeInstanceOfStart) {
+    }
+
+    public void updatePuckDirection(Double puckX, Double puckY) {
+    }
+
+    public void updateOpponentMalletDirection(Double malletX, Double malletY) {
     }
 }

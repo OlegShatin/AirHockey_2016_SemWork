@@ -1,5 +1,7 @@
 package ru.kpfu.group11501.airhockey.model;
 
+import ru.kpfu.group11501.airhockey.net.Client;
+
 /**
  * @author Oleg Shatin
  *         11-501
@@ -12,7 +14,7 @@ public interface Controllable {
      * @param newX
      * @param newY
      */
-    void move(double newX, double newY);
+    void move(double newX, double newY, boolean needSendDataToServer);
 
     /**
      * set this object's state not controllable more - block it
@@ -38,4 +40,5 @@ public interface Controllable {
     void setX(double newX);
     double getY();
     void setY(double newY);
+    void setClient(Client client);
 }

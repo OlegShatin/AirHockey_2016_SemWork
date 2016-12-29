@@ -19,8 +19,10 @@ import java.io.IOException;
 public class RegController extends Controller {
     @FXML
     private TextField namePlayer;
+    @FXML
+    private TextField hostname;
     private boolean isInputNameNotNull() {
-        return namePlayer.getLength() != 0;
+        return namePlayer.getLength() != 0 && hostname.getLength() != 0;
     }
 
     //todo - Design: passed click on "connect to game" button event - needed uploading of game main scene to form
@@ -32,12 +34,10 @@ public class RegController extends Controller {
             stage.setScene(new Scene(root, 400, 600));
             stage.show();
             Controller controller = loader.getController();
-            Client client = new ClientImpl(name, controller);
+            Client client = new ClientImpl(name, controller, hostname.getText());
             controller.setStage(stage);
             client.askGame(name);
-            synchronized (this){
-                this.notifyAll();
-            }
+
 
 
 

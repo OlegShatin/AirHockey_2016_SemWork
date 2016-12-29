@@ -9,11 +9,8 @@ import java.util.HashMap;
  *         this enum can allow call method by name of item using reflection
  */
 public enum NetMethod {
-
-    //for client and for server
-    updatePuckDirection("UPD", new Class[]{Double.class, Double.class}, Object.class),
-
     //messages for client
+    updatePuckDirection("UPD", new Class[]{Double.class, Double.class}, Object.class),
     updateGameScore("UGS", new Class[]{Integer.class, Integer.class}, Client.class),
     updateOpponentMalletDirection("UOD", new Class[]{Double.class, Double.class}, Client.class),
     setGameResult("SGR", new Class[]{Integer.class, Integer.class}, Client.class),
@@ -28,7 +25,8 @@ public enum NetMethod {
     clientIsReady("CIR", null, Server.class),
     clientAsksGame("CAG",new Class[] {String.class}, Server.class),
     clientLeavesGame("CLG", null, Server.class),
-    clientLoseRound("CLR", null, Server.class)
+    clientLoseRound("CLR", null, Server.class),
+    clientUpdatesPuckDirection("CPD", new Class[]{Double.class, Double.class}, Object.class)
     ;
     //Hash map to get method by code
     private static HashMap<String, NetMethod> codeMap;

@@ -14,7 +14,6 @@ import java.net.Socket;
  */
 public class ClientImpl implements Runnable, Client {
     public static final int PORT = 3456;
-    public static final String HOST = "localhost";
     private String toSend;
     private Thread thread;
     private Thread senderThread;
@@ -29,6 +28,7 @@ public class ClientImpl implements Runnable, Client {
     private Boolean opponentIsReady;
     private Boolean startFlag;
     private final Object toSendFlag = new Object();
+    private String hostname;
 
     public Boolean getUserIsReady() {
         return userIsReady;
@@ -41,7 +41,7 @@ public class ClientImpl implements Runnable, Client {
 
     @Override
     public String getOpponentName() {
-        return name;
+        return opponentName;
     }
 
     public void setUserIsReady(Boolean userIsReady) {
@@ -64,24 +64,28 @@ public class ClientImpl implements Runnable, Client {
     public void setStartFlag(Boolean startFlag) {
         Boolean temp = this.startFlag;
         this.startFlag = startFlag;
-
+        synchronized (temp) {
             temp.notifyAll();
+        }
 
 
     }
 
-    public ClientImpl(String name, Controller controller) {
+    public ClientImpl(String name, Controller controller, String hostname) {
+        this.hostname = hostname;
+        this.name = name;
+        userIsReady = new Boolean(false);
+        startFlag = new Boolean(false);
+        opponentName = "Ожидание игрока";
+        opponentIsReady = new Boolean(false);
         this.setController(controller);
         // создаем поток, передавая поведение
         // нашего Client
         thread = new Thread(this);
         thread.setDaemon(true);
         thread.start();
-        this.name = name;
-        opponentName = "Ожидание игрока";
-        userIsReady = new Boolean(false);
-        opponentIsReady = new Boolean(false);
-        startFlag = new Boolean(false);
+
+
 
 
     }
@@ -91,7 +95,7 @@ public class ClientImpl implements Runnable, Client {
 
         try {
 
-            server = new Socket(HOST, PORT);
+            server = new Socket(hostname, PORT);
             printWriter = new PrintWriter(server.getOutputStream(), true);
             bufferedReader = new BufferedReader(new InputStreamReader(server.getInputStream()));
             isConnected = true;
@@ -104,11 +108,14 @@ public class ClientImpl implements Runnable, Client {
                     toSend = "";
                     while (true) {
                         synchronized (toSendFlag) {
-                            System.out.println("start waiting");
                             toSendFlag.wait();
-                            System.out.println("sending: "+ toSend);
-                            System.out.println("stop waiting");
-                            printWriter.println(toSend);
+
+                            if (!toSend.equals("")) {
+
+                                printWriter.println(toSend);
+                            } else {
+                                System.out.println("TRY TO SEND NOTHING!");
+                            }
                             toSend = "";
                         }
                     }
@@ -118,10 +125,7 @@ public class ClientImpl implements Runnable, Client {
             });
             senderThread.setDaemon(true);
             senderThread.start();
-            synchronized (controller){
-                controller.wait();
-                System.out.println("ITSWORK");
-            }
+
 
 
 
@@ -131,16 +135,14 @@ public class ClientImpl implements Runnable, Client {
                 String[] request = bufferedReader.readLine().split("\\?");
 
                 NetMethod method = NetMethod.getMethod(request[0]);
-                System.out.print(method.name());
                 Method executableMethod = Client.class.getMethod(method.name(), method.getArgsClasses());
                 //try to parse arguments from string to Integer, Double and Long if they exists
                 Object[] args = null;
                 if (request.length > 1) {
-                    args = new Object[request[1].split("&").length];
+                    args = new Object[request[1].split("\\&").length];
                     int i = 0;
                     try {
-                        for (String stringArg : request[1].split("&")) {
-                            System.out.println(" " + stringArg);
+                        for (String stringArg : request[1].split("\\&")) {
                             if (method.getArgsClasses()[i].equals(Integer.class)) {
                                 args[i] = method.getArgsClasses()[i].getMethod("parseInt", String.class)
                                         .invoke(null, stringArg);
@@ -153,6 +155,7 @@ public class ClientImpl implements Runnable, Client {
                                             .invoke(null, stringArg);
                                 }
                             }
+                            i++;
                         }
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
@@ -165,8 +168,6 @@ public class ClientImpl implements Runnable, Client {
             }
         } catch (IOException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -175,14 +176,16 @@ public class ClientImpl implements Runnable, Client {
 
         this.opponentName = opponentName;
         Platform.runLater(() -> {
-            controller.setOpponentName(opponentName);
+            controller.setOpponentName();
         });
 
     }
 
     @Override
     public void updatePuckDirection(Double puckX, Double puckY) {
-
+        Platform.runLater(() -> {
+            controller.updatePuckDirection(puckX, puckY);
+        });
     }
 
     @Override
@@ -195,11 +198,17 @@ public class ClientImpl implements Runnable, Client {
 
     @Override
     public void updateOpponentMalletDirection(Double malletX, Double malletY) {
-
+        Platform.runLater(() -> {
+            controller.updateOpponentMalletDirection(malletX, malletY);
+        });
     }
 
     @Override
     public void setGameResult(Integer clientScore, Integer opponentScore) {
+        startFlag = false;
+        Platform.runLater(() -> {
+            controller.updateScore(clientScore, opponentScore);
+        });
 
     }
 
@@ -207,6 +216,7 @@ public class ClientImpl implements Runnable, Client {
     public void gameStartsInTime(Long timeInstanceOfStart) {
         Platform.runLater(() -> {
             controller.gameStart();
+            controller.setOpponentName();
         });
         Platform.runLater(() -> {
             controller.gameStartsInTime(timeInstanceOfStart);
@@ -216,6 +226,7 @@ public class ClientImpl implements Runnable, Client {
 
     @Override
     public void opponentIsReady() {
+        System.out.println("opponentIsReady GOT FROM SERVER");
         synchronized (opponentIsReady){
             opponentIsReady.notifyAll();
             opponentIsReady = true;
@@ -229,18 +240,59 @@ public class ClientImpl implements Runnable, Client {
     }
 
     @Override
+    public void sendPuckDirection(Double puckX, Double puckY) {
+
+        synchronized (toSendFlag){
+            if (puckX.toString().length() >= 7 && puckY.toString().length() >= 7) {
+                toSend = NetMethod.clientUpdatesPuckDirection.getCode() + "?" + puckX.toString().substring(0, 7) + "&" + puckY.toString().substring(0, 7);
+            } else {
+                toSend = NetMethod.clientUpdatesPuckDirection.getCode() + "?" + puckX.toString() + "&" + puckY.toString();
+            }
+            toSendFlag.notifyAll();
+        }
+    }
+
+    @Override
+    public void sendMalletDirection(Double malletX, Double malletY) {
+
+        synchronized (toSendFlag){
+            if (malletX.toString().length() >= 7 && malletY.toString().length() >= 7) {
+                toSend = NetMethod.updateClientMalletDirection.getCode() + "?" + malletX.toString().substring(0, 7) + "&" + malletY.toString().substring(0, 7);
+            } else {
+                toSend = NetMethod.updateClientMalletDirection.getCode() + "?" + malletX.toString() + "&" + malletY.toString();
+            }
+            toSendFlag.notifyAll();
+        }
+    }
+
+    @Override
     public void setReady() {
         toSend = NetMethod.clientIsReady.getCode();
         synchronized (toSendFlag){
             toSendFlag.notifyAll();
         }
+        synchronized (opponentIsReady) {
+            if (!opponentIsReady) {
+                try {
+                    System.out.println("waiting opponent is ready");
+                    opponentIsReady.wait();
+                    System.out.println("waiting opponent is ready off");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
     }
 
     @Override
     public void setController(Controller controller) {
         this.controller = controller;
         controller.setClient(this);
-        controller.setOpponentName(opponentName);
+        Platform.runLater(()->{
+            controller.setOpponentName();
+        });
+
     }
 
     @Override
@@ -251,8 +303,8 @@ public class ClientImpl implements Runnable, Client {
             e.printStackTrace();
         }
 
-        toSend = NetMethod.clientAsksGame.getCode()+"?"+name;
         synchronized (toSendFlag){
+            toSend = NetMethod.clientAsksGame.getCode()+"?"+name;
             toSendFlag.notifyAll();
         }
         synchronized (controller) {
@@ -268,7 +320,11 @@ public class ClientImpl implements Runnable, Client {
 
     @Override
     public void loseRound() {
-
+        synchronized (toSendFlag){
+            System.out.println("lose");
+            toSend = NetMethod.clientLoseRound.getCode();
+            toSendFlag.notifyAll();
+        }
     }
 }
 

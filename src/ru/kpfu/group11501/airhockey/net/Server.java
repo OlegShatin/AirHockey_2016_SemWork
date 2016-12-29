@@ -7,7 +7,7 @@ import java.net.SocketException;
  *         11-501
  */
 public interface Server {
-    void updatePuckDirection(Double clientPuckX, Double clientPuckY);
+    void clientUpdatesPuckDirection(Double clientPuckX, Double clientPuckY);
     void updateClientMalletDirection(Double clientMalletX, Double clientMalletY);
     void clientIsReady();
     void clientAsksGame(String name);
