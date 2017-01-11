@@ -16,14 +16,15 @@ import ru.kpfu.group11501.airhockey.net.Client;
 public class Puck implements Controllable {
     private static final double FIELD_WIDTH = 400.0;
     private static final double FIELD_HEIGHT = 600.0;
-    private static final double SPEED = 1;
+    private static final double SPEED = 8;
+    private static final double EPS = 10e-6;
     private Line ortoLine;
     private Line targetLine;
     private Mallet vectTarget;
     private Label currTargetLabes;
     private Label curBoundsLabes;
     private Mallet target;
-    //private Client client;
+    private Client client;
 
     private ImageView view;
     private Pane gameField;
@@ -42,7 +43,7 @@ public class Puck implements Controllable {
         this.view = view;
         this.gameField = gameField;
         this.userMallet = userMallet;
-        //this.client = client;
+        this.client = client;
         this.gates = userGates;
         selfMover = new Thread(() -> {
             while (true) {
@@ -56,6 +57,7 @@ public class Puck implements Controllable {
                 Platform.runLater(() -> {
                     move(selfMoveX, selfMoveY, true);
                 });
+                
             }
         });
         selfMover.setDaemon(true);
@@ -93,12 +95,25 @@ public class Puck implements Controllable {
         startX = getX();
         startY = getY();
         if (gameField.getChildren().contains(view) && !blocked) {
+            if (newX < 0) {
+                newX = 0;
+            } else {
+                if (newX > FIELD_WIDTH)
+                    newX = FIELD_WIDTH;
+            }
+            if (newY < 0) {
+                newY = 0;
+            } else {
+                if (newY > FIELD_HEIGHT)
+                    newY = FIELD_HEIGHT;
+            }
             double dX = (newX - getX());
             double dY = (newY - getY());
             Border directionBorder = null;
 
-            if (!(((Math.abs(newX - 0.0) < 10e-3 || Math.abs(newX - FIELD_WIDTH) < 10e-3) && newX <= FIELD_WIDTH && newX >= 0)
-                    || ((Math.abs(newY - 0.0) < 10e-3  || Math.abs(newY - FIELD_HEIGHT)< 10e-3)  && newY <= FIELD_HEIGHT && newY >= 0))) {
+            if (!((Math.abs(newX - 0.0) < EPS || Math.abs(newX - FIELD_WIDTH) < EPS)
+                    || (Math.abs(newY - 0.0) < EPS  || Math.abs(newY - FIELD_HEIGHT)< EPS))) {
+                
                 //define the edge of field that will be next
                 if (newX / newY < startX / startY && newX / (newY - Border.LEFT.y2) > startX / (startY - Border.LEFT.y2)) {
                     directionBorder = Border.LEFT;
@@ -138,12 +153,12 @@ public class Puck implements Controllable {
 
             double newCorrectX = startX + dX;
             double newCorrectY = startY + dY;
-            currTargetLabes.setText((int)newCorrectX + "; " + (int)newCorrectY);
+            //currTargetLabes.setText((int)newCorrectX + "; " + (int)newCorrectY);
             target.setX(newCorrectX);
             target.setY(newCorrectY);
-            /*synchronized (client) {
+            synchronized (client) {
                 client.sendPuckDirection(newCorrectX, newCorrectY);
-            }*/
+            }
             double trackLenght = Math.sqrt(dX * dX + dY * dY) / SPEED;
             double rateX = dX / trackLenght;
             double rateY = dY / trackLenght;
@@ -152,10 +167,12 @@ public class Puck implements Controllable {
 
             double finalDY = dY;
             currentMoveTimer = new AnimationTimer() {
-                int i = 0;
-
                 @Override
                 public void handle(long now) {
+                    if (!blocked) {
+                        setX(getX() + rateX);
+                        setY(getY() + rateY);
+                    }
                     //firstly check is intersects with userMallet
                     double actualX = getX();
                     double actualY = getY();
@@ -171,6 +188,7 @@ public class Puck implements Controllable {
                         }
                         return;
                     }
+
                     double deltaX = userMallet.getX() - actualX;
                     double deltaY = userMallet.getY() - actualY;
 
@@ -180,25 +198,25 @@ public class Puck implements Controllable {
                             actualY > FIELD_HEIGHT - view.getFitHeight() / 2  - 5){
                         System.out.println("in gates!");
                         this.stop();
+
                         //block();
                         setX(FIELD_WIDTH / 2);
                         setY(FIELD_HEIGHT/ 2);
-                        /*synchronized (client) {
+                        synchronized (client) {
                             client.loseRound();
-                        }*/
+                        }
                         selfMoveY = 0;
                         selfMoveX = 0;
                         synchronized (selfMoveSync) {
                             selfMoveSync.notifyAll();
                         }
+                        return;
                     } else {
                         vectTarget.setX(actualX + deltaX/2);
                         vectTarget.setY(actualY + deltaY/2);
                         ortoLine.setStartX(actualX + deltaX/2);
                         ortoLine.setStartY(actualY + deltaY/2);
 
-                        double intersectY = actualY + deltaY / 2;
-                        double intersectX = actualX + deltaX / 2;
                         //ortogonally vector with length == 1
                         double deltaOrtoY = (finalDY / Math.abs(finalDY)) * Math.sqrt(1 / (1 + (deltaY * deltaY) / (deltaX * deltaX)));
                         double deltaOrtoX = -deltaY * deltaOrtoY / deltaX;
@@ -225,78 +243,81 @@ public class Puck implements Controllable {
                         targetLine.setEndY(updatedY);
 
 
-                        if (vectorLenght < + userMallet.getView().getFitHeight() + 1) {
-                            new Thread(()->{
-                                Platform.runLater(() -> {
-                                    userMallet.block();
-                                });
-                                synchronized (this) {
-                                    try {
-                                        Thread.sleep(300);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                Platform.runLater(() -> {
-                                    userMallet.unblock();
-                                });
-                            }).start();
+                        if (vectorLenght < userMallet.getView().getFitHeight() + 1) {
+
                             this.stop();
                             setX(actualX + (updatedX - actualX) / (Math.abs(updatedX - actualX)) * userMallet.getView().getFitHeight() / 2);
                             setY(actualY + (updatedY - actualY) / (Math.abs(updatedY - actualY)) * userMallet.getView().getFitHeight() / 2);
                             selfMoveX = updatedX;
                             selfMoveY = updatedY;
+                            if (collaidsWithBorders(actualX, actualY)){
+                                new Thread(()->{
+                                    Platform.runLater(() -> {
+                                        userMallet.block();
+                                        userMallet.setX(userMallet.getX() - (updatedX - actualX) / (Math.abs(updatedX - actualX))
+                                                * (Math.abs(vectorLenght - userMallet.getView().getFitWidth()) + 2));
+                                        userMallet.setY(userMallet.getY() - (updatedY - actualY) / (Math.abs(updatedY - actualY))
+                                                * (Math.abs(vectorLenght - userMallet.getView().getFitHeight()) + 2));
+                                    });
+                                    synchronized (this) {
+                                        try {
+                                            while (collaidsWithBorders(getX(), getY())){
+                                                Thread.sleep(300);
+                                            }
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    Platform.runLater(() -> {
+                                        userMallet.unblock();
+                                    });
+                                }).start();
+                                if (getX() < 0 + view.getFitWidth()/2) {
+                                    selfMoveX = 0 + view.getFitWidth()/2;
+                                    if (deltaY > 0) {
+                                        selfMoveY = 0;
+                                    }  else {
+                                        selfMoveY = FIELD_HEIGHT;
+                                    }
+                                } else {
+                                    if (getX() > FIELD_WIDTH - view.getFitWidth()/2) {
+                                        selfMoveX = FIELD_WIDTH - view.getFitWidth()/2;
+                                        if (deltaY > 0) {
+                                            selfMoveY = 0;
+                                        }  else {
+                                            selfMoveY = FIELD_HEIGHT;
+                                        }
+                                    }
+                                }
+                                if (getY() < 0 + view.getFitHeight()/2) {
+                                    selfMoveY = 0 + view.getFitHeight()/2;
+                                    if (deltaX > 0) {
+                                        selfMoveX = 0;
+                                    }  else {
+                                        selfMoveX = FIELD_WIDTH;
+                                    }
+                                } else {
+                                    if (getY() > FIELD_HEIGHT - view.getFitHeight()/2){
+                                        selfMoveY = FIELD_HEIGHT - view.getFitHeight()/2;
+                                        if (deltaX > 0) {
+                                            selfMoveX = 0;
+                                        }  else {
+                                            selfMoveX = FIELD_WIDTH;
+                                        }
+                                    }
+                                }
+                                setY(getY() + (selfMoveY - getY()) / 10);
+                                setX(getX() + (selfMoveX - getX()) / 10);
+                            }
                             synchronized (selfMoveSync) {
                                 selfMoveSync.notifyAll();
                             }
+                            return;
                         } else {
-                            //handle impact with borders
-                            if (actualX < view.getFitWidth() / 2) {
+                            if (collaidsWithBorders(actualX,actualY)){
                                 this.stop();
-                                setX(view.getFitWidth() / 2 + 1);
-                                selfMoveX = startX;
-                                selfMoveY = actualY - (startY - actualY);
                                 synchronized (selfMoveSync) {
                                     selfMoveSync.notifyAll();
-                                }
-                            } else {
-                                if (actualX > FIELD_WIDTH - view.getFitWidth() / 2) {
-                                    this.stop();
-                                    setX(FIELD_WIDTH - view.getFitWidth() / 2 - 1);
-                                    selfMoveX = startX;
-                                    selfMoveY = actualY - (startY - actualY);
-                                    synchronized (selfMoveSync) {
-                                        selfMoveSync.notifyAll();
-                                    }
-                                } else {
-                                    if (actualY < view.getFitHeight() / 2) {
-                                        this.stop();
-                                        setY(view.getFitHeight() / 2 + 1);
-                                        selfMoveX = actualX - (startX - actualX);
-                                        selfMoveY = startY;
-                                        synchronized (selfMoveSync) {
-                                            selfMoveSync.notifyAll();
-                                        }
-                                    } else {
-                                        if (actualY > FIELD_HEIGHT - view.getFitHeight() / 2) {
-                                            this.stop();
-                                            setY(FIELD_HEIGHT - view.getFitHeight() / 2 - 1);
-                                            selfMoveX = actualX - (startX - actualX);
-                                            selfMoveY = startY;
-                                            synchronized (selfMoveSync) {
-                                                selfMoveSync.notifyAll();
-                                            }
-                                        } else {
-                                            if (i < trackLenght && !blocked) {
-                                                curBoundsLabes.setText((int)getX() + "; " + (int)getY());
-                                                setX(getX() + rateX);
-                                                setY(getY() + rateY);
-                                                i++;
-                                            } else {
-                                                this.stop();
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -311,6 +332,50 @@ public class Puck implements Controllable {
                 currentMoveTimer.stop();
             }
         }
+    }
+    private boolean collaidsWithBorders(double actualX, double actualY){
+
+        //handle impact with borders
+        if (actualX < view.getFitWidth() / 2) {
+            toSetX(view.getFitWidth() / 2 + 1);
+            selfMoveX = startX;
+            selfMoveY = actualY - (startY - actualY);
+            return true;
+        } else {
+            if (actualX > FIELD_WIDTH - view.getFitWidth() / 2) {
+                toSetX(FIELD_WIDTH - view.getFitWidth() / 2 - 1);
+                selfMoveX = startX;
+                selfMoveY = actualY - (startY - actualY);
+                return true;
+            } else {
+                if (actualY < view.getFitHeight() / 2) {
+                    toSetY(view.getFitHeight() / 2 + 1);
+                    selfMoveX = actualX - (startX - actualX);
+                    selfMoveY = startY;
+                    return true;
+                } else {
+                    if (actualY > FIELD_HEIGHT - view.getFitHeight() / 2) {
+                        toSetY(FIELD_HEIGHT - view.getFitHeight() / 2 - 1);
+                        selfMoveX = actualX - (startX - actualX);
+                        selfMoveY = startY;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private void toSetY(double newY) {
+        Platform.runLater(() -> {
+            setY(newY);
+        });
+    }
+
+    private void toSetX(double newX) {
+        Platform.runLater(() -> {
+            setX(newX);
+        });
     }
 
     @Override
@@ -334,10 +399,19 @@ public class Puck implements Controllable {
         return view.getX() + view.getFitWidth() / 2 + view.getLayoutX();
     }
 
+
     @Override
     public void setX(double newX) {
-
-        view.setX(newX - view.getLayoutX() - view.getFitWidth() / 2);
+        //curBoundsLabes.setText((int)getX() + "; " + (int)getY());
+        if (newX <= FIELD_WIDTH) {
+            if (newX >= 0) {
+                view.setX(newX - view.getLayoutX() - view.getFitHeight() / 2);
+            } else {
+                view.setX(0 - view.getLayoutX() - view.getFitHeight() / 2);
+            }
+        } else {
+            view.setX(FIELD_WIDTH - view.getLayoutX() - view.getFitHeight() / 2);
+        }
     }
 
     @Override
@@ -347,14 +421,22 @@ public class Puck implements Controllable {
 
     @Override
     public void setY(double newY) {
-
-        view.setY(newY - view.getLayoutY() - view.getFitHeight() / 2);
+        //curBoundsLabes.setText((int)getX() + "; " + (int)getY());
+        if (newY <= FIELD_HEIGHT) {
+            if (newY >= 0) {
+                view.setY(newY - view.getLayoutY() - view.getFitHeight() / 2);
+            } else {
+                view.setY(0 - view.getLayoutY() - view.getFitHeight() / 2);
+            }
+        } else {
+            view.setY(FIELD_HEIGHT - view.getLayoutY() - view.getFitHeight() / 2);
+        }
     }
 
     @Override
     public void setClient(Client client)
     {
-        //this.client = client;
+        this.client = client;
     }
 
     public ImageView getView() {

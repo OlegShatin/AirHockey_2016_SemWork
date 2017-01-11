@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.shape.Line;
 import ru.kpfu.group11501.airhockey.model.Mallet;
 import ru.kpfu.group11501.airhockey.model.Puck;
 import ru.kpfu.group11501.airhockey.net.Client;
@@ -50,13 +51,28 @@ public class GameController extends Controller {
     private ImageView sam;
     @FXML
     private Pane gameField;
+    @FXML
+    public Label currMalBounds;
+    @FXML
+    public Label currTarget;
+    @FXML
+    public ImageView vecTarget;
+    @FXML
+    public Line ortoLine;
+    @FXML
+    public Line targetLine;
+    @FXML
+    private ImageView target;
     private Object scoreSync = new Object();
 
     public void initialize(){
 
         userMallet = new Mallet(malRed, gameField, client);
         opponentMallet = new Mallet(malBlue, gameField, client);
-        puck = new Puck(sam, gameField, userMallet,  client, userGates);
+        puck = new Puck(sam, gameField, userMallet,  client, userGates, new Mallet(target, gameField, client),
+                currMalBounds, currTarget, new Mallet(vecTarget, gameField, client), ortoLine, targetLine);
+        userMallet.setPuck(puck);
+        opponentMallet.setPuck(puck);
         userCurrentGameScore = 0;
         opponentCurrentGameScore = 0;
         userMallet.block();

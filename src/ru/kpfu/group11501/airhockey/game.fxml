@@ -11,9 +11,9 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<GridPane  fx:id="root" alignment="center" hgap="10" onMouseMoved="#mouseMoved" onKeyPressed="#keyPressed"
+<GridPane  fx:id="root" alignment="center" hgap="10" onMouseMoved="#mouseMoved"
           prefHeight="610.0" prefWidth="400.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.60"
-          xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.group11501.airhockey.controller.PhysicController">
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.group11501.airhockey.controller.GameController">
     <columnConstraints>
         <ColumnConstraints />
     </columnConstraints>
@@ -70,9 +70,9 @@
                     </font>
                 </Label>
                 <Label fx:id="opponentNameLabel" layoutX="186.0" layoutY="228.0" />
-                <Label fx:id="currMalBounds" layoutX="186.0" layoutY="238.0" />
-                <Label fx:id="currTarget" layoutX="186.0" layoutY="248.0" />
-                <Region fx:id="userGates" layoutX="126.0" layoutY="583.0" prefHeight="17.0" prefWidth="149.0" style="-fx-background-color: black;" />
+                <Label fx:id="currMalBounds" layoutX="186.0" layoutY="238.0"/>
+                <Label fx:id="currTarget" layoutX="186.0" layoutY="248.0"/>
+                <Region fx:id="userGates" layoutX="126.0" layoutY="583.0" prefHeight="17.0" prefWidth="149.0" />
             <Line fx:id="ortoLine" endX="100.0" startX="0.0" startY="10"/>
             <Line fx:id="targetLine" endX="100.0" startX="0.0" startY="15"/>
             </children>

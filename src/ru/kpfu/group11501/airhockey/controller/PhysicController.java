@@ -64,6 +64,8 @@ public class PhysicController extends Controller{
         opponentMallet = new Mallet(malBlue, gameField, client);
         puck = new Puck(sam, gameField, userMallet,  client, userGates, new Mallet(target, gameField, client),
                 currMalBounds, currTarget, new Mallet(vecTarget, gameField, client), ortoLine, targetLine);
+        userMallet.setPuck(puck);
+        opponentMallet.setPuck(puck);
         userCurrentGameScore = 0;
         opponentCurrentGameScore = 0;
         puck.setX(GAME_FIELD_CENTER_X);
