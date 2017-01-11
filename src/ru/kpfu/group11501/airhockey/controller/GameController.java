@@ -138,6 +138,7 @@ public class GameController extends Controller {
     private void roundRun() {
         puck.setX(GAME_FIELD_CENTER_X);
         puck.setY(GAME_FIELD_CENTER_Y);
+        puck.getView().setVisible(true);
         System.out.println("RoundRun!");
         userMallet.unblock();
         opponentMallet.unblock();

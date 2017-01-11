@@ -8,9 +8,12 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="root" alignment="center" hgap="10" onMouseMoved="#mouseMoved" prefHeight="600.0" prefWidth="400.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.group11501.airhockey.controller.GameController">
+<GridPane  fx:id="root" alignment="center" hgap="10" onMouseMoved="#mouseMoved" onKeyPressed="#keyPressed"
+          prefHeight="610.0" prefWidth="400.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.60"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.kpfu.group11501.airhockey.controller.PhysicController">
     <columnConstraints>
         <ColumnConstraints />
     </columnConstraints>
@@ -21,24 +24,34 @@
     <children>
         <Pane fx:id="gameField" prefHeight="600.0" prefWidth="400.0">
             <children>
-                <ImageView fitHeight="600.0" fitWidth="556.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fitHeight="600.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@img/field.jpg" />
                     </image>
                 </ImageView>
                 <ImageView fx:id="malRed" fitHeight="49.0" fitWidth="50.0" layoutX="75.0" layoutY="467.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@img/b1.jpg" />
+                        <Image url="@img/green.png" />
                     </image>
                 </ImageView>
                 <ImageView fx:id="malBlue" fitHeight="49.0" fitWidth="50.0" layoutX="67.0" layoutY="104.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@img/b2.jpg" />
+                        <Image url="@img/red.png" />
                     </image>
                 </ImageView>
-                <ImageView fx:id="sam" fitHeight="49.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                <ImageView fx:id="target" fitHeight="49.0" fitWidth="50.0" layoutX="60.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@img/sem.jpg" />
+                        <Image url="@img/target.png" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="vecTarget" fitHeight="49.0" fitWidth="50.0" layoutX="60.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@img/target.png" />
+                    </image>
+                </ImageView>
+                <ImageView fx:id="sam" fitHeight="49.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" visible="false">
+                    <image>
+                        <Image url="@img/puck.png" />
                     </image>
                 </ImageView>
                 <ImageView fitHeight="49.0" fitWidth="50.0" layoutX="337.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
@@ -56,8 +69,12 @@
                         <Font size="35.0" />
                     </font>
                 </Label>
-            <Label fx:id="opponentNameLabel" layoutX="186.0" layoutY="228.0" />
-            <Region fx:id="userGates" layoutX="126.0" layoutY="583.0" prefHeight="17.0" prefWidth="149.0" />
+                <Label fx:id="opponentNameLabel" layoutX="186.0" layoutY="228.0" />
+                <Label fx:id="currMalBounds" layoutX="186.0" layoutY="238.0" />
+                <Label fx:id="currTarget" layoutX="186.0" layoutY="248.0" />
+                <Region fx:id="userGates" layoutX="126.0" layoutY="583.0" prefHeight="17.0" prefWidth="149.0" style="-fx-background-color: black;" />
+            <Line fx:id="ortoLine" endX="100.0" startX="0.0" startY="10"/>
+            <Line fx:id="targetLine" endX="100.0" startX="0.0" startY="15"/>
             </children>
         </Pane>
     </children>

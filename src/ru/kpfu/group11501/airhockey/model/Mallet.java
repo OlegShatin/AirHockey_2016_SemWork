@@ -14,7 +14,7 @@ public class Mallet implements Controllable {
     private ImageView view;
     private Pane gameField;
     private AnimationTimer currentMoveTimer;
-    private Client client;
+    //private Client client;
 
     private static final double DISTANCE = 10;
     private boolean blocked;
@@ -27,19 +27,19 @@ public class Mallet implements Controllable {
         this.view = view;
         this.gameField = gameField;
         blocked = false;
-        this.client = client;
+        //this.client = client;
     }
 
     @Override
     public void move(double newX, double newY, boolean needSendDataToServer) {
         if(gameField.getChildren().contains(view) && !blocked) {
             if (needSendDataToServer) {
-                if (newY < 300 + view.getFitWidth()/2) {
+                /*if (newY < 300 + view.getFitWidth()/2) {
                     newY = 300 + view.getFitWidth()/2;
-                }
-                synchronized (client) {
+                }*/
+                /*synchronized (client) {
                     client.sendMalletDirection(newX, newY);
-                }
+                }*/
             }
             double dX = newX - view.getX() - view.getLayoutX() - view.getFitWidth()/2;
             double dY = newY - view.getY() - view.getLayoutY() - view.getFitHeight()/2;
@@ -110,7 +110,7 @@ public class Mallet implements Controllable {
 
     @Override
     public void setClient(Client client) {
-        this.client = client;
+        //this.client = client;
     }
 
 
